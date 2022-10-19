@@ -1,4 +1,4 @@
-module goUtils
+module github.com/Gikabu/goUtils
 
 go 1.17
 

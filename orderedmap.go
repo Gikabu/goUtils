@@ -1,4 +1,4 @@
-package goUtils
+package main
 
 import (
 	"bytes"
