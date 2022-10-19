@@ -9,7 +9,7 @@ import (
 )
 
 func TestOrderedMap(t *testing.T) {
-	o := New()
+	o := NewOrderedMap()
 	// number
 	o.Set("number", 3)
 	v, _ := o.Get("number")
@@ -83,7 +83,7 @@ func TestOrderedMap(t *testing.T) {
 }
 
 func TestBlankMarshalJSON(t *testing.T) {
-	o := New()
+	o := NewOrderedMap()
 	// blank map
 	b, err := json.Marshal(o)
 	if err != nil {
@@ -109,7 +109,7 @@ func TestBlankMarshalJSON(t *testing.T) {
 }
 
 func TestMarshalJSON(t *testing.T) {
-	o := New()
+	o := NewOrderedMap()
 	// number
 	o.Set("number", 3)
 	// string
@@ -128,7 +128,7 @@ func TestMarshalJSON(t *testing.T) {
 		1,
 	})
 	// orderedmap
-	v := New()
+	v := NewOrderedMap()
 	v.Set("e", 1)
 	v.Set("a", 2)
 	o.Set("orderedmap", v)
@@ -175,7 +175,7 @@ func TestMarshalJSON(t *testing.T) {
 }
 
 func TestMarshalJSONNoEscapeHTML(t *testing.T) {
-	o := New()
+	o := NewOrderedMap()
 	o.SetEscapeHTML(false)
 	// string special characters
 	o.Set("specialstring", "\\.<>[]{}_-")
@@ -193,7 +193,7 @@ func TestMarshalJSONNoEscapeHTML(t *testing.T) {
 
 func TestMarshalJSONNoEscapeHTMLRecursive(t *testing.T) {
 	src := `{"x":"<>","y":[{"z":["<>"]}]}`
-	o := New()
+	o := NewOrderedMap()
 	o.SetEscapeHTML(false)
 	err := json.Unmarshal([]byte(src), &o)
 	if err != nil {
@@ -237,7 +237,7 @@ func TestUnmarshalJSON(t *testing.T) {
   ],
   "should not break with { character in key": 1
 }`
-	o := New()
+	o := NewOrderedMap()
 	err := json.Unmarshal([]byte(s), &o)
 	if err != nil {
 		t.Error("JSON Unmarshal error", err)
@@ -342,7 +342,7 @@ func TestUnmarshalJSONDuplicateKeys(t *testing.T) {
 		"a": {},
 		"b": [[1]]
 	}`
-	o := New()
+	o := NewOrderedMap()
 	err := json.Unmarshal([]byte(s), &o)
 	if err != nil {
 		t.Error("JSON Unmarshal error with special chars", err)
@@ -399,7 +399,7 @@ func TestUnmarshalJSONDuplicateKeys(t *testing.T) {
 
 func TestUnmarshalJSONSpecialChars(t *testing.T) {
 	s := `{ " \u0041\n\r\t\\\\\\\\\\\\ "  : { "\\\\\\" : "\\\\\"\\" }, "\\":  " \\\\ test ", "\n": "\r" }`
-	o := New()
+	o := NewOrderedMap()
 	err := json.Unmarshal([]byte(s), &o)
 	if err != nil {
 		t.Error("JSON Unmarshal error with special chars", err)
@@ -445,7 +445,7 @@ func TestUnmarshalJSONArrayOfMaps(t *testing.T) {
   ]
 }
 `
-	o := New()
+	o := NewOrderedMap()
 	err := json.Unmarshal([]byte(s), &o)
 	if err != nil {
 		t.Error("JSON Unmarshal error", err)
@@ -510,7 +510,7 @@ func TestOrderedMap_SortKeys(t *testing.T) {
   "c": 3
 }
 `
-	o := New()
+	o := NewOrderedMap()
 	json.Unmarshal([]byte(s), &o)
 
 	o.SortKeys(sort.Strings)
@@ -537,7 +537,7 @@ func TestOrderedMap_Sort(t *testing.T) {
   "c": 3
 }
 `
-	o := New()
+	o := NewOrderedMap()
 	json.Unmarshal([]byte(s), &o)
 	o.Sort(func(a *Pair, b *Pair) bool {
 		return a.value.(float64) > b.value.(float64)
@@ -561,7 +561,7 @@ func TestOrderedMap_Sort(t *testing.T) {
 func TestOrderedMap_empty_array(t *testing.T) {
 	srcStr := `{"x":[]}`
 	src := []byte(srcStr)
-	om := New()
+	om := NewOrderedMap()
 	json.Unmarshal(src, om)
 	bs, _ := json.Marshal(om)
 	marshalledStr := string(bs)
@@ -578,7 +578,7 @@ func TestOrderedMap_empty_array(t *testing.T) {
 func TestOrderedMap_empty_map(t *testing.T) {
 	srcStr := `{"x":{}}`
 	src := []byte(srcStr)
-	om := New()
+	om := NewOrderedMap()
 	json.Unmarshal(src, om)
 	bs, _ := json.Marshal(om)
 	marshalledStr := string(bs)

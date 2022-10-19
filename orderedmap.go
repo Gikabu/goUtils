@@ -34,7 +34,7 @@ type OrderedMap struct {
 	escapeHTML bool
 }
 
-func New() *OrderedMap {
+func NewOrderedMap() *OrderedMap {
 	o := OrderedMap{}
 	o.keys = []string{}
 	o.values = map[string]interface{}{}
