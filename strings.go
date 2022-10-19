@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func randomCode(length int) string {
+func RandomCode(length int) string {
 	var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 	ll := len(chars)
 	b := make([]byte, length)
@@ -24,7 +24,7 @@ func randomCode(length int) string {
 	return string(b)
 }
 
-func randomNumber(length int) string {
+func RandomNumber(length int) string {
 	var chars = "0123456789"
 	ll := len(chars)
 	b := make([]byte, length)
@@ -42,7 +42,7 @@ func randomNumber(length int) string {
 	return string(b)
 }
 
-func randomString(length int) string {
+func RandomString(length int) string {
 	var chars = "ABCDEF012GHIJKLM3456NOPQRST789UVWXYZ"
 	ll := len(chars)
 	b := make([]byte, length)
@@ -56,7 +56,7 @@ func randomString(length int) string {
 	return string(b)
 }
 
-func randomStringAlphabet(length int) string {
+func RandomStringAlphabet(length int) string {
 	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	ll := len(chars)
 	b := make([]byte, length)

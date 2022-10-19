@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 )
 
-func transcode(in, out interface{}) error {
+func Transcode(in, out interface{}) error {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(in)
 	if err != nil {
