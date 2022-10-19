@@ -37,10 +37,10 @@ func GetScryptTokenID(token string) string {
 	return string(B64Decode(id))
 }
 
-func ValidateScryptToken(token string, publicKey string, privateKey string) (bool, error) {
+func ValidateScryptToken(token string, publicKey string, privateKey string) error {
 	subs := strings.Split(token, "#")
 	if len(subs) < 2 {
-		return false, errors.New("malformed scrypt token")
+		return errors.New("malformed scrypt token")
 	}
 	idPart := subs[0]
 	cipherPart := subs[1]
@@ -53,19 +53,19 @@ func ValidateScryptToken(token string, publicKey string, privateKey string) (boo
 	copy(secret[:], B64Decode(privateKey))
 
 	if byteSize(idPart) != (byteSize(cipherPart)-box.AnonymousOverhead) {
-		return false, errors.New("invalid scrypt token length")
+		return errors.New("invalid scrypt token length")
 	}
 
 	messageData, ok := box.OpenAnonymous(nil, sealed, &pk, &secret)
 	if !ok {
-		return false, errors.New("token decryption failed")
+		return errors.New("token decryption failed")
 	}
 
 	if string(messageData) != uniqueId {
-		return false, errors.New("invalid scrypt token")
+		return errors.New("invalid scrypt token")
 	}
 
-	return true, nil
+	return nil
 }
 
 func byteSize(b64String string) uint64 {
