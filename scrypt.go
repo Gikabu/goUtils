@@ -3,11 +3,21 @@ package utils
 import (
 	"crypto/rand"
 	b64 "encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/nacl/box"
 	"strings"
+	"time"
 )
+
+type TokenPayload struct {
+	ID string `json:"id"`
+	Type string `json:"type"`
+	Subject string `json:"subject"`
+	TargetID string `json:"target_id"`
+	Expiry time.Time `json:"expiry"`
+}
 
 func B64Encode(data []byte) string  {
 	sEnc := b64.StdEncoding.EncodeToString(data)
@@ -19,13 +29,14 @@ func B64Decode(sEnc string) []byte {
 	return decodeString
 }
 
-func GenerateScryptToken(uniqueId string, publicKey string) (string, error) {
+func GenerateScryptToken(payload TokenPayload, publicKey string) (string, error) {
 	var pk [32]byte
 	copy(pk[:], B64Decode(publicKey))
 	var out []byte
 
-	id := []byte(uniqueId)
-	sealed, err := box.SealAnonymous(out, id, &pk, rand.Reader)
+	id := []byte(payload.ID)
+	payloadBytes, err := json.Marshal(payload)
+	sealed, err := box.SealAnonymous(out, payloadBytes, &pk, rand.Reader)
 	if err != nil {
 		return "", err
 	}
@@ -37,14 +48,14 @@ func GetScryptTokenID(token string) string {
 	return string(B64Decode(id))
 }
 
-func ValidateScryptToken(token string, publicKey string, privateKey string) error {
+func ValidateScryptToken(token string, publicKey string, privateKey string) (*TokenPayload, error) {
 	subs := strings.Split(token, "#")
 	if len(subs) < 2 {
-		return errors.New("malformed scrypt token")
+		return nil, errors.New("malformed scrypt token")
 	}
 	idPart := subs[0]
 	cipherPart := subs[1]
-	uniqueId := string(B64Decode(idPart))
+	id := string(B64Decode(idPart))
 	sealed := B64Decode(cipherPart)
 
 	var pk [32]byte
@@ -53,19 +64,25 @@ func ValidateScryptToken(token string, publicKey string, privateKey string) erro
 	copy(secret[:], B64Decode(privateKey))
 
 	if byteSize(idPart) != (byteSize(cipherPart)-box.AnonymousOverhead) {
-		return errors.New("invalid scrypt token length")
+		return nil, errors.New("invalid scrypt token length")
 	}
 
-	messageData, ok := box.OpenAnonymous(nil, sealed, &pk, &secret)
+	payloadBytes, ok := box.OpenAnonymous(nil, sealed, &pk, &secret)
 	if !ok {
-		return errors.New("token decryption failed")
+		return nil, errors.New("token decryption failed")
 	}
 
-	if string(messageData) != uniqueId {
-		return errors.New("invalid scrypt token")
+	payload := new(TokenPayload)
+	err := json.Unmarshal(payloadBytes, payload)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("invalid scrypt token, %s", err.Error()))
 	}
 
-	return nil
+	if payload.ID != id {
+		return nil, errors.New("invalid scrypt token")
+	}
+
+	return payload, nil
 }
 
 func byteSize(b64String string) uint64 {
