@@ -63,10 +63,6 @@ func ValidateScryptToken(token string, publicKey string, privateKey string) (*To
 	var secret [32]byte
 	copy(secret[:], B64Decode(privateKey))
 
-	if byteSize(idPart) != (byteSize(cipherPart)-box.AnonymousOverhead) {
-		return nil, errors.New("invalid scrypt token length")
-	}
-
 	payloadBytes, ok := box.OpenAnonymous(nil, sealed, &pk, &secret)
 	if !ok {
 		return nil, errors.New("token decryption failed")
@@ -83,8 +79,4 @@ func ValidateScryptToken(token string, publicKey string, privateKey string) (*To
 	}
 
 	return payload, nil
-}
-
-func byteSize(b64String string) uint64 {
-	return uint64((len(b64String) * 6) / 8)
 }
